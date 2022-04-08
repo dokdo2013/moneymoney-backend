@@ -30,4 +30,8 @@ serverless deploy
 deactivate
 ```
 
+Deploy to Production
+```bash
+sls deploy --stage v1 --region ap-northeast-2
+```
 
