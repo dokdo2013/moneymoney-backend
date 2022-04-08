@@ -13,6 +13,7 @@ provider:
   runtime: python3.8
   lambdaHashingVersion: '20201221'
   region: ap-northeast-2
+  
 
 functions:
   api:
@@ -21,9 +22,11 @@ functions:
       - http:
           path: /
           method: ANY
+          cors: true
       - http:
           path: /{proxy+}
           method: ANY
+          cors: true
 
 plugins:
   - serverless-wsgi

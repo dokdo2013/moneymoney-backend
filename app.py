@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, make_response
+from flask_cors import CORS
 import json
 import dotenv
 import os
@@ -9,6 +10,7 @@ from urllib import parse
 
 
 app = Flask(__name__)
+cors = CORS(app)
 
 
 @app.route("/money", methods=['GET'])
@@ -38,7 +40,7 @@ def add_to_sheets():
         category = req_data['category']
         pay_method = req_data['payMethod']
         item = req_data['item']
-        item_detail = req_data['item_detail']
+        item_detail = req_data['itemDetail']
         price = req_data['price']
         etc = req_data['etc']
     except Exception as e:
