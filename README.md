@@ -4,8 +4,8 @@
 ## Tech Stack
 - Serverless Framework
 - Python 3.8
+- Flask
 - AWS Lambda
-- AWS RDS (MariaDB 10.2)
 
 ## Relational Links
 - [Frontend Git Repo](https://github.com/dokdo2013/moneymoney-front)
