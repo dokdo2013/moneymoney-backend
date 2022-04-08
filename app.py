@@ -3,14 +3,12 @@ import json
 import dotenv
 import os
 import onetimepass as otp
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+from urllib import parse
 
 
 app = Flask(__name__)
-
-
-@app.route("/")
-def hello_from_root():
-    return jsonify(message='Hello from root!')
 
 
 @app.route("/money", methods=['GET'])
@@ -22,7 +20,8 @@ def get_sheet_data():
 def add_to_sheets():
     # Load Dotenv
     try:
-        dotenv.load_dotenv(verbose=True)
+        dotenv_file = dotenv.find_dotenv()
+        dotenv.load_dotenv(dotenv_file, verbose=True)
     except Exception as e:
         print(e)
         data = {
@@ -67,9 +66,53 @@ def add_to_sheets():
         }
         return make_response(json.dumps(data), 401)
     
-    # Add to Sheets
-    
-    
+    # Connect to Google Sheets API
+    try:
+        scope = [
+            'https://spreadsheets.google.com/feeds',
+            'https://www.googleapis.com/auth/drive',
+        ]
+        json_file_name = os.getenv('CRED_FILE_NAME')
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(json_file_name, scope)
+        gc = gspread.authorize(credentials)
+
+        spreadsheet_key = os.getenv('DOCUMENT_ID')
+        doc = gc.open_by_key(spreadsheet_key)
+        worksheet = doc.worksheet(parse.unquote(os.getenv('SHEET_NAME')))
+    except Exception as e:
+        print(e)
+        data = {
+            'code': 400,
+            'message': 'Unable to connect Google Sheets API'
+        }
+        return make_response(json.dumps(data), 400)
+
+    # Get new row number
+    RECENT_SEARCH_ROW = int(os.getenv('RECENT_SEARCH_ROW'))
+    MAX_SEARCH_LENGTH = int(os.getenv('MAX_SEARCH_LENGTH'))
+    target_row = -1
+    for i in range(RECENT_SEARCH_ROW, MAX_SEARCH_LENGTH):
+        col_data = worksheet.cell(i, 2).value
+        if col_data is None:
+            target_row = i
+            dotenv.set_key(dotenv_file, 'RECENT_SEARCH_ROW', str(target_row))
+            break
+
+    # Update row
+    if target_row == -1:
+        data = {
+            'code': 400,
+            'message': 'Unable to update row'
+        }
+        return make_response(json.dumps(data), 400)
+        
+    worksheet.update_cell(target_row, 2, date)
+    worksheet.update_cell(target_row, 4, category)
+    worksheet.update_cell(target_row, 5, item)
+    worksheet.update_cell(target_row, 6, item_detail)
+    worksheet.update_cell(target_row, 7, pay_method)
+    worksheet.update_cell(target_row, 8, price)
+    worksheet.update_cell(target_row, 9, etc)
     
     data = {
         'code': 200,
