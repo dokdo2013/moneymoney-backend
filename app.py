@@ -103,7 +103,7 @@ def add_to_sheets():
             bin_end = cursor
         else:
             bin_start = cursor
-        if start + 1 == end:
+        if bin_start + 1 == bin_end:
             target_row = cursor + 1
             break
 
