@@ -98,7 +98,7 @@ def add_to_sheets():
     while cnt < 30:  # Prevent Infinite Loop
         cnt = cnt + 1
         cursor = int((bin_start + bin_end) / 2)
-        row_data = worksheet.cell(cursor, 2).value
+        col_data = worksheet.cell(cursor, 2).value
         if col_data is None:
             bin_end = cursor
         else:
