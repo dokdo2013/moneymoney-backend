@@ -30,8 +30,17 @@ serverless deploy
 deactivate
 ```
 
+Deploy to Dev Stage (Just Function)
+```bash
+sls deploy
+sls deploy --function api  # Just Function
+```
+
 Deploy to Production
 ```bash
 sls deploy --stage v1 --region ap-northeast-2
+sls deploy --stage v1 --region ap-northeast-2 --function api  # Just Function
 ```
+
+
 
