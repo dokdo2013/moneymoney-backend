@@ -89,16 +89,30 @@ def add_to_sheets():
         }
         return make_response(json.dumps(data), 400)
 
-    # Get new row number
-    # 추후에 Binary Search로 변경
-    RECENT_SEARCH_ROW = int(os.getenv('RECENT_SEARCH_ROW'))
+    # Get new row number (Binary Search)
     MAX_SEARCH_LENGTH = int(os.getenv('MAX_SEARCH_LENGTH'))
     target_row = -1
-    for i in range(RECENT_SEARCH_ROW, MAX_SEARCH_LENGTH):
-        col_data = worksheet.cell(i, 2).value
+    cnt = 0
+    bin_start = 0
+    bin_end = MAX_SEARCH_LENGTH
+    while cnt < 30:  # Prevent Infinite Loop
+        cnt = cnt + 1
+        cursor = int((bin_start + bin_end) / 2)
+        row_data = worksheet.cell(cursor, 2).value
         if col_data is None:
-            target_row = i
+            bin_end = cursor
+        else:
+            bin_start = cursor
+        if start + 1 == end:
+            target_row = cursor + 1
             break
+
+    if cnt == 30:
+        data = {
+            'code': 400,
+            'message': 'Failed to find appropriate cell to write in Spreadsheet'
+        }
+        return make_response(json.dumps(data), 400)
 
     # Update row
     if target_row == -1:
